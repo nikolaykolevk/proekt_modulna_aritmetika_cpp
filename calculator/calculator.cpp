@@ -31,7 +31,7 @@ bool Calculator::get_err() const {
 }
 
 bool Calculator::is_prim_root(int num) const {
-    if (num >= n) return -1;
+    if (num <= 0 || num >= n) return -1;
     return arr[1][num];
 }
 
@@ -40,6 +40,8 @@ bool Calculator::change_zn(int n) {
     if(arr[0]) delete [] arr[0];
     if(arr[1]) delete [] arr[1];
     arr[0] = arr[1] = nullptr;
+    err = false;
+    err_msg = "";
 
     if (n <= 0) {
         err_msg = "Value can not be " + QString::number(n);
@@ -107,13 +109,11 @@ bool Calculator::init_arr_prim_roots() {
     try {
         arr[1] = new int[n]{0};
 
-
         int cnt=cnt_s_nums(n);
         tmp_arr = new int[cnt];
-        for (int i=0; i<cnt; i++) tmp_arr[i] = -1;
 
         int tmp;
-        bool okay=true;
+        bool okay;
 
         for (int i=1; i<n; i++) {
 
@@ -174,15 +174,13 @@ int Calculator::power(int num, int exp) const {
             k++;
         }
 
-        tmp = 1;
         if (k>=exp) {
-            for (int i=0; i<exp; i++) {
-                tmp=(tmp*num)%n;
-            }
-        } else {
-            for (int i=0; i<(exp%k); i++) {
-                tmp=(tmp*num)%n;
-            }
+            exp = k;
+        }
+
+        tmp = 1;
+        for (int i=0; i<exp; i++) {
+            tmp=(tmp*num)%n;
         }
 
         new_num=tmp;
@@ -203,18 +201,16 @@ int Calculator::power(int num, int exp) const {
 
 int Calculator::dlog (int base, int num) const {
 
-    if (base <= 0)
-
     err = false;
     err_msg = "";
 
-    if (base <= 1 || base >= n || num <= 0 || num >= n) {
+    if (base <= 1 || base >= n || num <= 0 || num >= n || gcd(num, n) != 1) {
 
         err_msg="incorrect numbers!";
         err = true;
         return -1;
 
-    } else if (arr[1][base]==1 && gcd(num, n) == 1) {
+    } else if (arr[1][base]==1) {
 
         int res=0;
 
